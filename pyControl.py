@@ -128,7 +128,7 @@ currX = 0
 lineLength = 50
 laserSpeed = 25 #mm/s
 laserSpeed *= 60 #mm/min
-linSpacing = 4
+linSpacing = 2
 
 #for y in range(0,50,linSpacing):
 #	f.writelines("M701 S40\n")
@@ -139,10 +139,9 @@ linSpacing = 4
 #	laserSpeed -= 60
 
 for x in range(0,50,linSpacing):
-	f.writelines("M701 S40\n")
-
+	f.writelines("M128 S35\n")
 	f.writelines("G1 X" + str(x) + " Y" + str(lineLength) + " F" + str(laserSpeed) + "\n") #give user heads up about the impending laser blast
-	f.writelines("M701 S0\n")
+	f.writelines("M128 S0\n")
 	f.writelines("G1 X" + str(x+linSpacing) + " Y0 F5000\n\n")
 	laserSpeed -= 60
 
@@ -150,7 +149,7 @@ for x in range(0,50,linSpacing):
 
 
 
-f.writelines("M701 S0 \n")
+f.writelines("M128 S0 \n")
 
 
 f.writelines("""
