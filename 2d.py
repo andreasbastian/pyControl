@@ -80,7 +80,7 @@ SweetStart = StartSintering(PWM=defaultPWM)
 SweetStop = StopSintering()
 
 
-fname = "laserLines.gcode"
+fname = "2d.gcode"
 print "Preparing to output: " + fname
 
 #Open the output f and paste on the "headers"
@@ -128,7 +128,7 @@ currX = 0
 lineLength = 10
 laserSpeed = 25 #mm/s
 laserSpeed *= 60 #mm/min
-linSpacing = 1
+linSpacing = 0.2
 
 #for y in range(0,50,linSpacing):
 #	f.writelines("M701 S40\n")
@@ -138,12 +138,11 @@ linSpacing = 1
 #	f.writelines("G1 X0 Y" + str(y+linSpacing) + " F5000\n\n")
 #	laserSpeed -= 60
 
-for x in range(0,10,linSpacing):
-	f.writelines("M128 S80\n")
-	f.writelines("G1 X" + str(x) + " Y" + str(lineLength) + " F" + str(laserSpeed) + "\n") #give user heads up about the impending laser blast
+for x in range(0,50,1):
+	f.writelines("M128 S100\n")
+	f.writelines("G1 X" + str(x/5) + " Y" + str(lineLength) + " F960" + "\n") 
 	f.writelines("M128 S0\n")
-	f.writelines("G1 X" + str(x+linSpacing) + " Y0 F5000\n\n")
-	laserSpeed -= 60
+	f.writelines("G1 X" + str(x/5+linSpacing) + " Y0 F5000\n\n")
 
 
 
