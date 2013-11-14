@@ -13,13 +13,36 @@ def now():
 	now = strftime("%A, %B %d, %Y @ %I:%M:%S %p", localtime())
 	return now
 
+def G1(_x,_y,_f):
+	f.writelines("G1 X" + str(_x) + " Y" + str(_y) + " F" + str(_f) + "\n")
 
-# PHYSICAL REGION IN WHICH TO GENERATE LINES FOR TESTING POWER PARAMETER SPACE
-SquareSize = 80
+def printSquare(size,spacing,speed,power):
+	#trace the perimeter to allow observation of single trace performance
+	#make sure we are in relative coordinates to facilitate easy reproduction
+	f.writelines("G91\n")
+	f.writelines("M128 S" + str(power) + "\n")
+	G1(0,size,speed)
+	G1(size,0,speed)
+	G1(0,-size,speed)
+	G1(-size,0,speed)
+	
+	numLines = size/spacing-2 #how many lines to do for infill
+	numLines = int(numLines)
+	linLength = size-2*spacing #as in an extrusion slicer, stop before perimeter
+	currX = 0
+	
+	G1(spacing,spacing,speed) # move to 
 
-numLines = 10 #number of test lines to sinter in target area
+	for i in range(0,int(numLines/2)+21,1): # what if numLines is odd?
+		G1(0,linLength,speed)
+		G1(spacing,0,speed)
+		G1(0,-linLength,speed)
+		G1(spacing,0,speed)
 
-fname = "spots.gcode"
+	f.writelines("M128 S0\n\n")	
+	G1(-size-2*spacing,-spacing,1000)
+
+fname = "squares.gcode"
 print "Preparing to output: " + fname
 
 #Open the output f and paste on the "headers"
@@ -27,22 +50,40 @@ f = open(fname,"w")
 f.writelines(";(***************SPOTS*********************)\n")
 f.writelines(";(*** " + str(now()) + " ***)\n")
 f.writelines("G92 X0 Y0 Z0 ; you are now at 0,0,0\n")
-f.writelines("""G90 ; absolute coordinates
-;(***************End of Beginning*********************)
-""")
-
-currX = 0
-lineLength = 10
-laserSpeed = 25 #mm/s
-laserSpeed *= 60 #mm/min
-linSpacing = 1
+f.writelines("G90 ; absolute coordinates;\n;(***************End of Beginning*********************)\n")
+'''
 laserPow = 35
-for y in range(0,10,linSpacing):
+for x in range(0,,linSpacing):
 	f.writelines("G1 X0 " + "Y " + str(y) + " F1000\n")
 	f.writelines("M128 S" + str(laserPow) + " \n")
 	f.writelines("G4 P100\n")
 	f.writelines("M128 S0\n")
 	laserPow += 5
+	printSquare(10,0.2,1000,30)
+'''
+power = 30
+feed = 1800
+linSpacing = 0.2
+xPrev = 0
+yPrev = 0
+for x in range(0,60,12):
+	for y in range(0,60,12):
+		f.writelines("G92 X" + str(xPrev) + " Y" + str(yPrev) +"\n")
+		f.writelines("G90\n")
+		G1(x,y,1200)	
+		printSquare(10,linSpacing,feed,power)
+		f.writelines("G90\n")
+		f.writelines("G92 X" + str(x) + " Y" + str(y) +"\n")
+		power += 1
+		xPrev = x
+		yPrev = y
+	feed -= 120 
+	power = 30 #reset the power
+
+
+
+
+
 
 f.writelines("M128 S0 \n")
 f.writelines("""
