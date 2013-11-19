@@ -16,73 +16,80 @@ def now():
 def G1(_x,_y,_f):
 	f.writelines("G1 X" + str(_x) + " Y" + str(_y) + " F" + str(_f) + "\n")
 
-def printSquare(size,spacing,speed,power):
+def printSquareX(size,spacing,speed,power):
 	#trace the perimeter to allow observation of single trace performance
 	#make sure we are in relative coordinates to facilitate easy reproduction
-	f.writelines("G91\n")
-	f.writelines("M128 S" + str(power) + "\n")
-	G1(0,size,speed)
-	G1(size,0,speed)
-	G1(0,-size,speed)
-	G1(-size,0,speed)
-	
-	numLines = size/spacing-2 #how many lines to do for infill
+
+	numLines = size/spacing #how many lines to do for infill
 	numLines = int(numLines)
-	linLength = size-2*spacing #as in an extrusion slicer, stop before perimeter
+	linLength = size
 	currX = 0
 	
-	G1(spacing,spacing,speed) # move to 
+	f.writelines("G91\n")
+	f.writelines("M128 S" + str(power) + "\n")
 
-	for i in range(0,int(numLines/2)+2,1): # what if numLines is odd?
+	for i in range(0,int(numLines/2),1): # what if numLines is odd?
+		G1(linLength,0,speed)
+		G1(0,spacing,speed)
+		G1(-linLength,0,speed)
+		if(i != int(numLines/2)-1):
+			G1(0,spacing,speed)
+
+	f.writelines("M128 S0\n\n")	
+	G1(0,-size+spacing,1000)
+
+def printSquareY(size,spacing,speed,power):
+	#trace the perimeter to allow observation of single trace performance
+	#make sure we are in relative coordinates to facilitate easy reproduction
+
+	numLines = size/spacing #how many lines to do for infill
+	numLines = int(numLines)
+	linLength = size
+	currX = 0
+	
+	f.writelines("G91\n") #switch to relative positioning
+	f.writelines("M128 S" + str(power) + "\n")
+
+	for i in range(0,int(numLines/2),1): # what if numLines is odd?
 		G1(0,linLength,speed)
 		G1(spacing,0,speed)
 		G1(0,-linLength,speed)
-		G1(spacing,0,speed)
+		if(i != int(numLines/2)-1):
+			G1(spacing,0,speed)
 
 	f.writelines("M128 S0\n\n")	
-	G1(-size-2*spacing,-spacing,1000)
-
-fname = "squares.gcode"
+	G1(-size+spacing,0,1000)
+fname = "cubes.gcode"
 print "Preparing to output: " + fname
 
 #Open the output f and paste on the "headers"
 f = open(fname,"w")
-f.writelines(";(***************SPOTS*********************)\n")
+f.writelines(";(***************CUBES*********************)\n")
 f.writelines(";(*** " + str(now()) + " ***)\n")
 f.writelines("G92 X0 Y0 Z0 ; you are now at 0,0,0\n")
 f.writelines("G90 ; absolute coordinates;\n;(***************End of Beginning*********************)\n")
-'''
-laserPow = 35
-for x in range(0,,linSpacing):
-	f.writelines("G1 X0 " + "Y " + str(y) + " F1000\n")
-	f.writelines("M128 S" + str(laserPow) + " \n")
-	f.writelines("G4 P100\n")
-	f.writelines("M128 S0\n")
-	laserPow += 5
-	printSquare(10,0.2,1000,30)
-'''
+
 power = 30
 feed = 1800
-linSpacing = 0.1
+linSpacing = 1
 xPrev = 0
 yPrev = 0
-for x in range(0,60,12):
-	for y in range(0,60,12):
-		f.writelines("G92 X" + str(xPrev) + " Y" + str(yPrev) +"\n")
-		f.writelines("G90\n")
-		G1(x,y,1200)	
-		printSquare(10,linSpacing,feed,power)
-		f.writelines("G90\n")
-		f.writelines("G92 X" + str(x) + " Y" + str(y) +"\n")
-		power += 1
-		xPrev = x
-		yPrev = y
-	feed -= 120 
-	power = 30 #reset the power
 
-
-
-
+for z in range(0,1,5):
+	for x in range(0,60,12):
+		for y in range(0,60,12):
+			f.writelines("G92 X" + str(xPrev) + " Y" + str(yPrev) +"\n")
+			f.writelines("G90\n")
+			G1(x,y,1200)	
+			printSquareX(10,linSpacing,feed,power)
+			f.writelines("G90\n")
+			f.writelines("G92 X" + str(x) + " Y" + str(y) +"\n")
+			power += 1
+			xPrev = x
+			yPrev = y
+		feed -= 120 
+		power = 30 #reset the power
+	f.writelines("M700\n") #distribute new layer
 
 
 f.writelines("M128 S0 \n")
