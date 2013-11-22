@@ -36,13 +36,16 @@ lineLength = 10
 laserSpeed = 25 #mm/s
 laserSpeed *= 60 #mm/min
 linSpacing = 1
-laserPow = 35
-for y in range(0,10,linSpacing):
-	f.writelines("G1 X0 " + "Y " + str(y) + " F1000\n")
-	f.writelines("M128 S" + str(laserPow) + " \n")
-	f.writelines("G4 P100\n")
-	f.writelines("M128 S0\n")
-	laserPow += 5
+power = 30
+dwell = 10
+for x in range(0,20,2):
+	for y in range(0,20,2):
+		f.writelines("G1 X" + str(x) + " Y" + str(y) + " F1000\n")
+		f.writelines("M128 S" + str(power) + " \n")
+		f.writelines("G4 P" + str(dwell) + "\n")
+		f.writelines("M128 S0\n")
+		dwell += 10
+	power += 1
 
 f.writelines("M128 S0 \n")
 f.writelines("""

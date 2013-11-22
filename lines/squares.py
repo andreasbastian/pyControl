@@ -62,8 +62,8 @@ for x in range(0,,linSpacing):
 	printSquare(10,0.2,1000,30)
 '''
 power = 30
-feed = 3600
-linSpacing = 0.1
+feed = 3000
+linSpacing = 0.05
 xPrev = 0
 yPrev = 0
 for x in range(0,55,11):
