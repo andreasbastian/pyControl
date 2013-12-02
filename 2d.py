@@ -80,35 +80,35 @@ SweetStart = StartSintering(PWM=defaultPWM)
 SweetStop = StopSintering()
 
 
-filename = "laserRanging.gcode"
-print "Preparing to output: " + filename
+fname = "2d.gcode"
+print "Preparing to output: " + fname
 
-#Open the output file and paste on the "headers"
-FILE = open(filename,"w")
-
-
-FILE.writelines(";(***************LASER_POWER_RANGE_TRAVERSAL*********************)\n")
-FILE.writelines(";(*** " + str(now()) + " ***)\n")
+#Open the output f and paste on the "headers"
+f = open(fname,"w")
 
 
+f.writelines(";(***************SPEED/POWER TRAVERSALS*********************)\n")
+f.writelines(";(*** " + str(now()) + " ***)\n")
 
-#FILE.writelines(""";(Copyright 2012 Jordan Miller, jmil@rice.edu, All Rights Reserved)
+
+
+#f.writelines(""";(Copyright 2012 Jordan Miller, jmil@rice.edu, All Rights Reserved)
 #;(*** Using significantly modified/customized Marlin Firmware, RAMBo ***)
 #M127 ; Laser Off
 #M129 ; Laser PWM set to zero
 #""")
 
-#FILE.writelines("G92 X"+ str(SquareSize/2) + " Y" + str(SquareSize/2) + " Z0 ; you are now at 0,0,0\n")
+f.writelines("G92 X0 Y0 Z0 ; you are now at 0,0,0\n")
 
-#FILE.writelines("""G90 ; absolute coordinates
-#;(***************End of Beginning*********************)
-#""")
+f.writelines("""G90 ; absolute coordinates
+;(***************End of Beginning*********************)
+""")
 
 # GO TO 0,0
 #ThisGCode.X = 0
 #ThisGCode.Y = 0
 #ThisGCode.F = regularSpeed
-#FILE.writelines(str(ThisGCode)+ "\n")
+#f.writelines(str(ThisGCode)+ "\n")
 
 
 
@@ -118,32 +118,49 @@ linSpacing = SquareSize/numLines
 #	ThisGCode.X = 0
 #	ThisGCode.Y = i*linSpacing
 #	ThisGCode.F = regularSpeed
-#	FILE.writelines(str(ThisGCode) + "\n")
+#	f.writelines(str(ThisGCode) + "\n")
+
+#messy, but functional:
+#def G1(targetX, targetY, speed):
+	#cmd = "G1 X" + targetX + " Y" + targetY + " E" + speed
+	#return cmd
+currX = 0
+lineLength = 10
+laserSpeed = 25 #mm/s
+laserSpeed *= 60 #mm/min
+linSpacing = 0.2
+
+#for y in range(0,50,linSpacing):
+#	f.writelines("M701 S40\n")
+#
+#	f.writelines("G1 X" + str(lineLength) + " Y" + str(y) + " F" + str(laserSpeed) + "\n") #give user heads up about the impending laser blast
+#	f.writelines("M701 S0\n")
+#	f.writelines("G1 X0 Y" + str(y+linSpacing) + " F5000\n\n")
+#	laserSpeed -= 60
+
+for x in range(0,50,1):
+	f.writelines("M128 S100\n")
+	f.writelines("G1 X" + str(x/5) + " Y" + str(lineLength) + " F960" + "\n") 
+	f.writelines("M128 S0\n")
+	f.writelines("G1 X" + str(x/5+linSpacing) + " Y0 F5000\n\n")
 
 
-for laserPWM in range(30,102,2):
-	FILE.writelines("G1 E0.5 F600\n") #give user heads up about the impending laser blast
-	FILE.writelines("M701 S" + str(laserPWM) + "\n")#set laser power
-	FILE.writelines("G4 S14\n")#let it stabilize and allow user to take power time average
-	
-	FILE.writelines("G1 E-0.5 F600\n") #twitch motor to tell user to start time averaging
-	FILE.writelines("G4 S7\n") #time average laser power
-	FILE.writelines("\n")#just to separate out the test blocks
-
-FILE.writelines("M701 S0 \n")
-FILE.writelines("G1 E10 F600 \n")
 
 
-FILE.writelines("""
+
+f.writelines("M128 S0 \n")
+
+
+f.writelines("""
 ;(end of the file, shutdown routines)
 M127 ; Laser Off
-M129 ; Laser PWM set to zero
+M701 S0 ; Laser PWM set to zero
 M84 ; motors off
 """)
 
 
 
-FILE.close
+f.close
 
 
 
