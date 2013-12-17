@@ -33,10 +33,14 @@ def printSquareX(a):
 
 	for i in range(0,int(numLines/2),1): # what if numLines is odd?
 		G1(linLength,0,speed)
+		f.writelines("M128 S0\n\n")	
 		G1(0,spacing,speed)
+		f.writelines("M128 S" + str(power) + "\n")
 		G1(-linLength,0,speed)
 		if(i != int(numLines/2)-1):
+			f.writelines("M128 S0\n\n")	
 			G1(0,spacing,speed)
+			f.writelines("M128 S" + str(power) + "\n")
 
 	f.writelines("M128 S0\n\n")	
 	G1(0,-size+spacing,1000)
@@ -59,9 +63,12 @@ def printSquareY(a):
 
 	for i in range(0,int(numLines/2),1): # what if numLines is odd?
 		G1(0,linLength,speed)
+		f.writelines("M128 S0\n\n")	
 		G1(spacing,0,speed)
+		f.writelines("M128 S" + str(power) + "\n")
 		G1(0,-linLength,speed)
 		if(i != int(numLines/2)-1): #clip last tail
+			f.writelines("M128 S0\n\n")	
 			G1(spacing,0,speed)
 
 	f.writelines("M128 S0\n\n")	
@@ -76,39 +83,38 @@ f.writelines(";(*** " + str(now()) + " ***)\n")
 f.writelines("G92 X0 Y0 Z0 ; you are now at 0,0,0\n")
 f.writelines("G90 ; absolute coordinates;\n;(***************End of Beginning*********************)\n")
 
-power = 30
-feed = 1800
-linSpacing = 0.5
 xPrev = 0
 yPrev = 0
 
 #declare and populate an array of viable 2D parameters
-params = 5*[4*[0]]
+params = 6*[4*[0]]
 #[square size, trace spacing, feed, power]
-params[0] = [10,0.2,1800,30]
-params[1] = [10,0.2,1800,31]
-params[2] = [10,0.1,3600,30]
-params[3] = [10,0.1,3600,31]
-params[4] = [10,0.2,3000,32]
+cubeSize = 8 
+params[0] = [cubeSize,0.05,3600,35]
+params[1] = [cubeSize,0.05,3480,35]
+params[2] = [cubeSize,0.05,3360,35]
+params[3] = [cubeSize,0.05,3240,35]
+params[4] = [cubeSize,0.05,3120,35]
+params[5] = [cubeSize,0.05,3000,34]
 
 combos = len(params)
 numLayers = 10
-
+cubeSpacing =  2
+cubeSpacing += cubeSize
 
 for z in range(0,numLayers,1):
 	f.writelines("G1 Z0." + str(z) + " F400\n") #just so we can proofread layers visually in Pronterface
 	for i in range(0,combos,1): #for now, just to a row.
 	#	for y in range(0,24,12):
 		f.writelines("G90\n")
-		G1(12*i,0,1200)	
+		G1(cubeSpacing*i,0,10000)	
 		if(z%2==0):
 			printSquareX(params[i])
 		else:
 			printSquareY(params[i])
 		f.writelines("G90\n")
-		f.writelines("G92 X" + str(i*12) + " Y0 Z0." + str(z) + "\n")
-		power += 1
-		xPrev = i*12
+		f.writelines("G92 X" + str(i*cubeSpacing) + " Y0 Z0." + str(z) + "\n")
+		xPrev = i*cubeSpacing
 	f.writelines("M128 S0;  Turn off the laser\n\
 G4 S2;  Pause for a couple of seconds to allow any buffered motions to finish\n\
 G91;  Switch to relative motion for a moment\n\

@@ -61,7 +61,7 @@ for x in range(0,,linSpacing):
 	laserPow += 5
 	printSquare(10,0.2,1000,30)
 '''
-power = 30
+power = 32
 feed = 3600
 linSpacing = 0.1
 xPrev = 0
@@ -78,7 +78,7 @@ for x in range(0,55,11):
 		xPrev = x
 		yPrev = y
 	feed -= 120 
-	power = 30 #reset the power
+	power = 32 #reset the power
 
 
 
