@@ -129,6 +129,11 @@ lineLength = 10
 laserSpeed = 25 #mm/s
 laserSpeed *= 60 #mm/min
 linSpacing = 1
+<<<<<<< HEAD
+speeds = [3000,2700,2400,2100,1800,1500,1200,900,600,300] #speeds to use in mm/min
+
+=======
+>>>>>>> f3ba5a3a6d9c61d5862718818305ee5f636ec4b7
 
 #for y in range(0,50,linSpacing):
 #	f.writelines("M701 S40\n")
@@ -138,15 +143,17 @@ linSpacing = 1
 #	f.writelines("G1 X0 Y" + str(y+linSpacing) + " F5000\n\n")
 #	laserSpeed -= 60
 
+<<<<<<< HEAD
+for i in range(0,len(speeds),1):
+	f.writelines("M128 S32\n")
+	f.writelines("G1 X" + str(i*linSpacing) + " Y" + str(lineLength) + " F" + str(speeds[i]) + "\n") 
+=======
 for x in range(0,10,linSpacing):
 	f.writelines("M128 S80\n")
 	f.writelines("G1 X" + str(x) + " Y" + str(lineLength) + " F" + str(laserSpeed) + "\n") #give user heads up about the impending laser blast
+>>>>>>> f3ba5a3a6d9c61d5862718818305ee5f636ec4b7
 	f.writelines("M128 S0\n")
-	f.writelines("G1 X" + str(x+linSpacing) + " Y0 F5000\n\n")
-	laserSpeed -= 60
-
-
-
+	f.writelines("G1 X" + str(i*linSpacing+linSpacing) + " Y0 F5000\n\n")
 
 
 f.writelines("M128 S0 \n")
